@@ -15,6 +15,14 @@
     padding: 0 0 10px;
 }
 
+.todo ul > li.done {
+    text-decoration: line-through;
+}
+
+/*ul > li:has(input:checked) {*/
+/*    text-decoration: line-through;*/
+/*}*/
+
 .todo ul > li:last-child {
     padding: 0;
 }
