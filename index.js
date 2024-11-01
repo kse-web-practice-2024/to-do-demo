@@ -1,41 +1,28 @@
-const form = document.querySelector('.todo');
+import createTodoList from '/todo/todo.js';
 
+const raw = window.localStorage.getItem('todos');
+const initialData = raw.length ? JSON.parse(raw) : [];
+
+const container = document.querySelector('.todo-list');
+const list = createTodoList(container, initialData);
+
+list.subscribe(function(todo) {
+    window.localStorage.setItem('todos', JSON.stringify(todo));
+});
+
+
+
+const form = document.querySelector('.todo');
 form.addEventListener('submit', function(e) {
     e.preventDefault();
 
     const input = document.querySelector('.input-element-js');
     const { value } = input
-    const li = document.createElement('li');
-    li.innerHTML = ` <label><input type="checkbox" />${value} <button type="button" class="remove">x</button></label>`;
 
-    const todo = document.querySelector('.todo-list');
-    todo.appendChild(li);
+    list.addTodo(value);
+
     input.value = "";
 });
 
 
-const listRoot = document.querySelector('.todo-list');
-listRoot.addEventListener('change', function(e) {
-    if (e.target.type === 'checkbox') {
-        e.target.closest('li').classList.toggle('done')
-    }
-});
 
-listRoot.addEventListener('click', function(e) {
-    if (e.target.type === 'button') {
-        e.target.closest('li').remove();
-        e.preventDefault();
-    }
-
-});
-
-
-
-/**
- *<li>
- *  <label>
- *  <input type="checkbox" />
- *    some value
- *  </label>
- * </li>
- */
