@@ -24,8 +24,9 @@ listRoot.addEventListener('change', function(e) {
 listRoot.addEventListener('click', function(e) {
     if (e.target.type === 'button') {
         e.target.closest('li').remove();
+        e.preventDefault();
     }
-    e.preventDefault();
+
 });
 
 
