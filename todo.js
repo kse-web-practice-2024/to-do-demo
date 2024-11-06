@@ -1,4 +1,4 @@
-import { createItem } from './to-to-item.js'
+import { ToDoItem } from './to-to-item.js'
 
 
 class ToDoList {
@@ -8,39 +8,36 @@ class ToDoList {
 
     constructor(container, initialData = []) {
         this.#container = container;
-        this.#toDoList = initialData;
+        this.#toDoList = initialData.map(({value, done}, index) => {
+            const todoItem = new ToDoItem(value, done, index);
 
-        container.addEventListener('change', (e) => {
-            if (e.target.type === 'checkbox') {
-                const li = e.target.closest('li');
-                const index = li.getAttribute('data-index');
-                this.#flip(index);
-            }
-        });
+            todoItem.onRemove((ref) => {
+                this.#removeTodo(ref)
+            });
 
-        container.addEventListener('click', (e) => {
-            if (e.target.type === 'button') {
-                const li = e.target.closest('li');
-                const index = li.getAttribute('data-index');
-                this.#removeTodo(index);
-                e.preventDefault();
-            }
+            todoItem.onChange((ref) => {
+                this.#flip(ref);
+            });
 
+            return todoItem;
         });
 
         this.#render()
     }
 
-
     #render() {
         this.#container.innerHTML = "";
-        this.#toDoList.map((el, index) => {
-            this.#container.appendChild(createItem(el.value, el.done, index));
-        });
+        this.#toDoList.forEach(el => this.#container.appendChild(el.element));
     }
 
     #removeTodo(index) {
-        this.#toDoList.splice(index, 1);
+        const indexToRemove = this.#toDoList.findIndex(({ref}) => ref === index);
+
+        if (indexToRemove === -1) {
+            return;
+        }
+
+        this.#toDoList.splice(indexToRemove, 1);
         this.#render();
         this.#listeners.forEach((listener) => {
             listener(this.#toDoList);
@@ -48,20 +45,30 @@ class ToDoList {
     }
 
     #flip(index) {
-        this.#toDoList[index].done = !this.#toDoList[index].done;
+        const indexToFlip = this.#toDoList.findIndex(({ref}) => ref === index);
+
+        if (indexToFlip === -1) {
+            return;
+        }
+
+        this.#toDoList[indexToFlip].done = !this.#toDoList[indexToFlip].done;
         this.#listeners.forEach((listener) => {
             listener(this.#toDoList);
         });
-
-        const currentElement = this.#container.querySelector(`[data-index="${index}"]`);
-        currentElement.classList.toggle('done');
     }
 
     addTodo(title) {
-        this.#toDoList.push({
-            value: title,
-            done: false
+        const index = this.#toDoList.length;
+        const todoItem = new ToDoItem(title, false, index);
+        todoItem.onRemove((ref) => {
+            this.#removeTodo(ref)
         });
+
+        todoItem.onChange((ref) => {
+            this.#flip(ref);
+        });
+
+        this.#toDoList.push(todoItem);
         this.#render();
         this.#listeners.forEach((listener) => {
             listener(this.#toDoList);

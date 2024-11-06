@@ -1,7 +1,8 @@
 import ToDoList from './todo.js';
 
 const raw = window.localStorage.getItem('todos');
-const initialData = raw.length ? JSON.parse(raw) : [];
+
+const initialData = raw !== null ? JSON.parse(raw) : [];
 
 const container = document.querySelector('.todo-list');
 const list = new ToDoList(container, initialData);
