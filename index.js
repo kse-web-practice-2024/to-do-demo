@@ -1,10 +1,10 @@
-import createTodoList from '/todo/todo.js';
+import ToDoList from './todo.js';
 
 const raw = window.localStorage.getItem('todos');
 const initialData = raw.length ? JSON.parse(raw) : [];
 
 const container = document.querySelector('.todo-list');
-const list = createTodoList(container, initialData);
+const list = new ToDoList(container, initialData);
 
 list.subscribe(function(todo) {
     window.localStorage.setItem('todos', JSON.stringify(todo));
